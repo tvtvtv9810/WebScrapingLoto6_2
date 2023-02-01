@@ -13,7 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 # ロト6の当選番号が掲載されているみずほ銀行ページのURL
 loto_url1 = 'https://www.mizuhobank.co.jp/retail/takarakuji/loto/backnumber/loto6'  # 1～460回目
 loto_url2 = 'https://www.mizuhobank.co.jp/retail/takarakuji/loto/backnumber/detail.html?fromto='  # 461回目以降
-num = 461  # 501  # 1 ほんとは
+num = 1
 
 main_num_list = []  # 本数字6桁を格納するリスト
 bonus_num_list = []  # ボーナス数字を格納するリスト
@@ -41,6 +41,25 @@ options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome('chromedriver', options=options)
 
 driver.implicitly_wait(10)  # seconds
+
+# 実行したいスクリプト
+java_script = '\
+    function jquery_exe(){\
+        /*\
+        console.log("test");\
+        */\
+    };\
+    function require(uri) {\
+        var js = document.createElement("script");\
+        js.type = "text/javascript";\
+        js.src = uri + "?v=" + new Date().getTime().toString();\
+        var head = document.getElementsByTagName("head")[0];\
+        head.appendChild(js);\
+    };\
+    require("http://code.jquery.com/jquery-3.4.1.js");\
+    setTimeout(jquery_exe, 1000);\
+'
+
 while num <= 1341:
 
     # 第1～460回目までの当選ページのURL
@@ -52,32 +71,40 @@ while num <= 1341:
 
     # PhntomJSで該当ページを取得
     driver.get(url)
+    print("- driver -----------------------------------")
+    print(driver)
+    print("------------------------------------")
+    # スクリプト実行
+    # driver.execute_script(java_script)
+
     # time.sleep(2) # javascriptのページを読み込む時間
     # 途中から取得先のサイトが非同期になってるため、遅延時間を変更
     print("10秒待機・・・")
     time.sleep(10)
-    elem = WebDriverWait(driver, 16).until(
-        EC.presence_of_element_located((By.CLASS_NAME, "wdt33p")))
+    # elem = WebDriverWait(driver, 16).until(
+    #     EC.presence_of_element_located((By.CLASS_NAME, "wdt33p")))
     html = driver.page_source.encode('utf-8')
-    print("- driver -----------------------------------")
-    print(driver)
-    print("------------------------------------")
     soup = BeautifulSoup(html, "html.parser")
+    print("- soup -----------------------------------")
+    print(soup)
+    print("------------------------------------")
+
     print(soup.title)
 
     # ロト6の当選番号がのっているテーブルの取得
     table = soup.find_all("table")
     del table[0]
-    print("- table -----------------------------------")
-    print(table)
-    print("------------------------------------")
 
     for i in table:
         # 本数字の取得
         main_num = i.find_all("tr")[2].find("td")
         print("------------------------------------")
         print(main_num)
+        print(main_num.string)
         print("------------------------------------")
+        if main_num.string == None:
+            print("continue;;;;")
+            continue
         main_num_list.append(main_num.string.split(" "))
 
         # ボーナス数字の取得

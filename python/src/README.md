@@ -32,6 +32,11 @@
 - ...
 - 1641-1651 回 : https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/backnumber/detail.html?fromto=1641_1651&type=loto6
 
+### 過去１年
+
+- https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/loto6/index.html?year=2022&month=2
+- https://www.mizuhobank.co.jp/retail/takarakuji/check/loto/loto6/index.html?year=2022&month=3
+
 ### 備考
 
 - 2023.01.26 時点では、過去は、1530 回まで（最新はまた別ページ）

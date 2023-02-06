@@ -44,8 +44,6 @@ driver = webdriver.Chrome('chromedriver', options=options)
 
 driver.implicitly_wait(10)  # seconds
 
-isFirst = True
-
 while num <= 1651:
 
     # 第1～460回目までの当選ページのURL
@@ -57,11 +55,6 @@ while num <= 1651:
 
     # PhntomJSで該当ページを取得
     driver.get(url)
-    if isFirst:
-        print("初回：10秒待機して再度・・・")
-        time.sleep(10)
-        driver.get(url)
-        isFirst = False
 
     # time.sleep(2) # javascriptのページを読み込む時間
     # 途中から取得先のサイトが非同期になってるため、遅延時間を変更
@@ -80,14 +73,10 @@ while num <= 1651:
     # 1つ目は表示用？２つめ以降は内部データ？1tableで1回分っぽい
     del tables[0]  # １つめ削除
 
+    isRetry = False
     for table1Dose in tables:
         tBody = table1Dose.find("tbody")
         trList = tBody.find_all("tr")
-
-        # 第何回目
-        times_list.append(trList[0].find("td").string)
-        # 抽選日リスト
-        lottery_date_list.append(trList[1].find("td").string)
 
         # 本数字の取得
         main_nums_str = trList[2].find("td").string
@@ -97,13 +86,20 @@ while num <= 1651:
         if main_nums_str != None:
             main_num_list.append(main_nums_str.split(" "))
         else:
-            main_num_list.append(["-", "-", "-", "-", "-", "-"])
+            isRetry = True
+            break
+
+        # 第何回目
+        times_list.append(trList[0].find("td").string)
+        # 抽選日リスト
+        lottery_date_list.append(trList[1].find("td").string)
 
         # ボーナス数字の取得
         bonus_num = trList[3].find("td")
         bonus_num_list.append(bonus_num.string)
 
-    num += 20  # 次のページに移動するためにnumに20を追加
+    if not isRetry:
+        num += 20  # 次のページに移動するためにnumに20を追加
     time.sleep(random.uniform(1, 3))  # 1～3秒Dos攻撃にならないようにするためにコードを止める
 
 # csvで出力
